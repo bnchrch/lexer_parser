@@ -15,33 +15,40 @@ defmodule LexerParser do
       :true
 
   """
-  def evaluate(expression) do
+  def evaluate(expression, variables \\ %{}) do
     with {:ok, tokens, _} <- :business_lexer.string(expression),
          {:ok, tree} <- :business_parser.parse(tokens) do
-      evaluate_tree(tree)
+      evaluate_tree(tree, variables)
     end
   end
 
   # Tree functions
   # =============
 
-  def evaluate_tree({:binary_expr, op, a, b}) do
-    with {:ok, a} <- evaluate_tree(a),
-         {:ok, b} <- evaluate_tree(b) do
-      apply_logic({:binary_expr, op, a, b})
+  def evaluate_tree({:binary_expr, op, a, b}, variables) do
+    with {:ok, a} <- evaluate_tree(a, variables),
+         {:ok, b} <- evaluate_tree(b, variables) do
+      apply_logic({:binary_expr, op, a, b}, variables)
     end
   end
 
-  def evaluate_tree(other) do
-    apply_logic(other)
+  def evaluate_tree(other, variables) do
+    apply_logic(other, variables)
   end
 
   # Logic functions
   # ==============
 
-  def apply_logic(boolean) when boolean in [true, false], do: {:ok, boolean}
+  def apply_logic(boolean, _variables) when boolean in [true, false], do: {:ok, boolean}
 
-  def apply_logic({:binary_expr, :and_op, a, b})
+  def apply_logic({:binary_expr, :and_op, a, b}, _variables)
     when is_boolean(a) and is_boolean(b), do: {:ok, a and b}
+
+  def apply_logic({:var, variable}, variables) do
+    case Map.get(variables, variable, nil) do
+      nil -> {:error, "variable \"#{variable}\" not provided in: #{inspect variables}"}
+      value -> {:ok, value}
+    end
+  end
 
 end
