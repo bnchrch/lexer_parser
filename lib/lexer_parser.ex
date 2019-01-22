@@ -32,6 +32,12 @@ defmodule LexerParser do
     end
   end
 
+  def evaluate_tree({:unary_expr, op, a}, variables) do
+    with {:ok, a} <- evaluate_tree(a, variables) do
+      apply_logic({:unary_expr, op, a}, variables)
+    end
+  end
+
   def evaluate_tree(other, variables) do
     apply_logic(other, variables)
   end
@@ -50,5 +56,8 @@ defmodule LexerParser do
       value -> {:ok, value}
     end
   end
+
+  def apply_logic({:unary_expr, :not_op, a}, _)
+    when is_boolean(a), do: {:ok, !a}
 
 end

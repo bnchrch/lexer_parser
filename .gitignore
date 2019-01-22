@@ -24,3 +24,6 @@ lexer_parser-*.tar
 
 # ignore yecc and leex output files
 /src/*.erl
+
+# ignore vscode files
+/.elixir_ls

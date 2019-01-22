@@ -9,6 +9,7 @@ false   : {token, {false,   TokenLine}}.
 true    : {token, {true,    TokenLine}}.
 
 and     : {token, {and_op,  TokenLine, list_to_atom(TokenChars)}}.
+not     : {token, {not_op,  TokenLine, list_to_atom(TokenChars)}}.
 
 {VAR}   : {token, {var,     TokenLine, list_to_binary(TokenChars)}}.
 {WS}+   : skip_token.
